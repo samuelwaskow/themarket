@@ -1,7 +1,15 @@
-import { render, screen, cleanup, asFragment } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import Notification from './Notification';
 
 afterEach(cleanup)
+
+test('Should not display a notification', () => {
+
+    render(<Notification type='danger' />)
+    let element = screen.queryByRole('alert') 
+    expect(element).toBeNull()
+
+});
 
 test('Should display a danger notification', () => {
 
