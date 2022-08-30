@@ -7,15 +7,16 @@ import NoWalletDetected from '../nowalletdetected/NoWalletDetected';
 import ConnectWallet from '../connectwallet/ConnectWallet';
 import Loading from '../loading/Loading'
 
-// import TokenArtifact from "../contracts/Token.json";
-// import contractAddress from "../contracts/contract-address.json";
+import TokenArtifact from "../../contracts/Token.json";
+import contractAddress from "../../contracts/contract-address.json";
+import Home from '../home/Home';
 
 /**
  * This is the Hardhat Network id that we set in our hardhat.config.js.
  * Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
  * to use when deploying to other networks.
  */
-const HARDHAT_NETWORK_ID = '1337';
+const HARDHAT_NETWORK_ID = '31337';
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -70,6 +71,7 @@ class App extends React.Component {
      * Note that we pass it a callback that is going to be called when the user
      * clicks a button. This callback just calls the _connectWallet method.
      */
+    console.log(`render - state [${JSON.stringify(this.state, undefined, 2)}]`);
     if (!this.state.selectedAddress) {
       return <ConnectWallet
         connectWallet={() => this._connectWallet()}
@@ -86,12 +88,14 @@ class App extends React.Component {
       return <Loading />;
     }
 
+    return <Home address={this.state.selectedAddress} />
   }
 
-
-  componentWillUnmount() {
-    // We poll the user's balance, so we have to stop doing that when Dapp
-    // gets unmounted
+  /**
+   * We poll the user's balance, so we have to stop doing that when Dapp
+   * gets unmounted
+   */
+  componentWillUnmount() { 
     this._stopPollingData();
   }
 
@@ -165,18 +169,19 @@ class App extends React.Component {
 
   /**
    * We first initialize ethers by creating a provider using window.ethereum
+   * 
+   * Then, we initialize the contract using that provider and the token's
+   * artifact. You can do this same thing with your contracts.
    */
   async _initializeEthers() {
 
     this._provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    // Then, we initialize the contract using that provider and the token's
-    // artifact. You can do this same thing with your contracts.
-    // this._token = new ethers.Contract(
-    //   contractAddress.Token,
-    //   TokenArtifact.abi,
-    //   this._provider.getSigner(0)
-    // );
+    this._token = new ethers.Contract(
+      contractAddress.Token,
+      TokenArtifact.abi,
+      this._provider.getSigner()
+    );
   }
 
 
@@ -185,8 +190,6 @@ class App extends React.Component {
    */
   _startPollingData() {
     this._pollDataInterval = setInterval(() => this._updateBalance(), 1000);
-
-    this._updateBalance();
   }
 
   /**
@@ -212,6 +215,7 @@ class App extends React.Component {
    */
   async _updateBalance() {
     const balance = await this._token.balanceOf(this.state.selectedAddress);
+    console.log(`_updateBalance - address [${this.state.selectedAddress}] balance [${JSON.stringify(balance, undefined, 2)}]`);
     this.setState({ balance });
   }
 
@@ -326,7 +330,7 @@ class App extends React.Component {
     this.setState({
       networkError: 'Please connect Metamask to Localhost:8545'
     });
-
+    console.error(`_checkNetwork - networkVersion [${window.ethereum.networkVersion}]`)
     return false;
   }
 }

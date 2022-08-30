@@ -10,7 +10,7 @@ class Notification extends React.Component {
     render() {
 
         if (!this.props.message) {
-            return (<div></div>)
+            return (<br />)
         } else {
 
             let className = "alert alert-danger d-flex justify-content-between"
@@ -29,8 +29,7 @@ class Notification extends React.Component {
                         className={buttonClassName}
                         data-dismiss="alert"
                         aria-label="Close"
-                        onClick={this.props.dismiss}
-                    >
+                        onClick={this.props.dismiss}>
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
