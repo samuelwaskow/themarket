@@ -1,16 +1,18 @@
 const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("Token contract", () => {
+describe("TheMarketToken contract", () => {
 
-
+    /**
+     * Fixture
+     */
     async function deployContractFixture() {
 
-        const Token = await ethers.getContractFactory("Token");
+        const TheMarketToken = await ethers.getContractFactory("TheMarketToken");
 
         const [owner, addr1, addr2] = await ethers.getSigners();
 
-        const contract = await Token.deploy();
+        const contract = await TheMarketToken.deploy();
 
         await contract.deployed();
 
@@ -20,22 +22,28 @@ describe("Token contract", () => {
     // You can nest describe calls to create subsections.
     describe("Deployment", function () {
 
-        it("Should set the right owner", async () => {
+        it("sets the right owner", async () => {
 
             const { contract, owner } = await loadFixture(deployContractFixture);
             expect(await contract.owner()).to.equal(owner.address);
         });
 
-        it("Should assign the total supply of tokens to the owner", async () => {
+        it("assigns the total supply of tokens to the owner", async () => {
             const { contract, owner } = await loadFixture(deployContractFixture);
             const ownerBalance = await contract.balanceOf(owner.address);
             expect(await contract.totalSupply()).to.equal(ownerBalance);
+        });
+
+        it("verifies the default token values", async () => {
+            const { contract, owner } = await loadFixture(deployContractFixture);
+            expect(await contract.totalSupply()).to.equal(10000000); // one million
+            expect(await contract.decimals()).to.equal(18);
         });
     });
 
     describe("Transactions", function () {
 
-        it("Should transfer tokens between accounts", async () => {
+        it("transfers tokens between accounts", async () => {
 
             const { contract, owner, addr1, addr2 } = await loadFixture(deployContractFixture);
 
@@ -49,7 +57,7 @@ describe("Token contract", () => {
             expect(await contract.balanceOf(addr1.address)).to.equal(0);
         });
 
-        it("should emit Transfer events", async function () {
+        it("emits Transfer events", async function () {
             const { contract, owner, addr1, addr2 } = await loadFixture(deployContractFixture);
 
             // Transfer 50 tokens from owner to addr1
@@ -64,7 +72,7 @@ describe("Token contract", () => {
                 .withArgs(addr1.address, addr2.address, 50);
         });
 
-        it("Should fail if sender doesn't have enough tokens", async function () {
+        it("fails if sender doesn't have enough tokens", async function () {
             const { contract, owner, addr1 } = await loadFixture(
                 deployContractFixture
             );
@@ -74,7 +82,7 @@ describe("Token contract", () => {
             // `require` will evaluate false and revert the transaction.
             await expect(
                 contract.connect(addr1).transfer(owner.address, 1)
-            ).to.be.revertedWith("Not enough tokens");
+            ).to.be.revertedWith("ERC20: transfer amount exceeds balance");
 
             // Owner balance shouldn't have changed.
             expect(await contract.balanceOf(owner.address)).to.equal(

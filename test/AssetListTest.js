@@ -16,7 +16,7 @@ describe("AssetList contract", () => {
         return { contract, owner, addr1, addr2 };
     }
 
-    it("New asset should assigned to the list of assets", async () => {
+    it("assigns to the list of assets", async () => {
 
         const { contract, owner } = await loadFixture(deployContractFixture);
 
