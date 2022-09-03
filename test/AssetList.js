@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("AssetList contract", () => {
+describe("AssetList Contract", () => {
 
     async function deployContractFixture() {
 

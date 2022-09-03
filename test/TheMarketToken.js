@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("TheMarketToken contract", () => {
+describe("TheMarketToken Contract", () => {
 
     /**
      * Fixture
