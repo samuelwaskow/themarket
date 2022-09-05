@@ -1,8 +1,9 @@
 const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("Asset Contract", () => {
+describe("Exchange Contract", () => {
 
+    const assetSymbol = "WINFT";
 
     /**
      * Fixture
@@ -23,12 +24,48 @@ describe("Asset Contract", () => {
     // You can nest describe calls to create subsections.
     describe("Deployment", function () {
 
-        it("verifies the default token values", async () => {
+        it("verifies the default exchange state", async () => {
             const { contract, owner } = await loadFixture(deployContractFixture);
             // expect(await contract.totalSupply()).to.equal(ipoAmount); 
             // expect(await contract.lastPrice()).to.equal(currentPrice); 
             // expect(await contract.decimals()).to.equal(18);
         });
+    });
+
+    describe("Assets", function () {
+
+        it("tries to create assets with invalid parameters", async () => {
+
+            const { contract, owner, addr1, addr2 } = await loadFixture(deployContractFixture)
+
+            // Bad Symbols
+            await  expect(contract.createAsset(owner.address, "1234", "123456", 1, 1000)).to.be.reverted
+            await  expect(contract.createAsset(owner.address, "123456", "123456", 1, 1000)).to.be.reverted
+
+            // Bad Descriptions
+            await  expect(contract.createAsset(owner.address, "12345", "1234", 1, 1000)).to.be.reverted
+            await  expect(contract.createAsset(owner.address, "12345", "123456789012345678901234567890123456789012345678901", 1, 1000)).to.be.reverted
+
+        });
+
+        it("creates and list an asset", async () => {
+
+            const { contract, owner, addr1, addr2 } = await loadFixture(deployContractFixture)
+
+            const description = "Ibovespa Index";
+            await contract.createAsset(owner.address, assetSymbol, description, 1, 1000)
+
+            expect(await contract.assetCount()).to.equal(1);
+            expect(await contract.assetsLength()).to.equal(1);
+
+            const asset = await contract.getAsset(0);
+
+            expect(await asset.symbol).to.equal(assetSymbol);
+            expect(await asset.description).to.equal(description);
+            expect(await asset.currentOffer).to.equal(1000);
+            expect(await asset.lastPrice).to.equal(1);
+        });
+
     });
 
     describe("Transactions", function () {
@@ -37,11 +74,10 @@ describe("Asset Contract", () => {
 
             const { contract, owner, addr1, addr2 } = await loadFixture(deployContractFixture)
 
-            let assetSymbol = "";
+            let localAssetSymbol = "";
             // Invalid Symbol
-            await  expect(contract.placeOrder(assetSymbol, addr1.address, 10, 90, true)).to.be.reverted
+            await  expect(contract.placeOrder(localAssetSymbol, addr1.address, 10, 90, true)).to.be.reverted
 
-            assetSymbol = "WINFT"
             await contract.createAsset(owner.address, assetSymbol, "Ibovespa Index", 1, 1000)
 
             // Place an ask and a bid offers
@@ -57,6 +93,14 @@ describe("Asset Contract", () => {
 
             expect(await contract.ordersLength(assetSymbol)).to.equal(3);
             expect(await contract.tradesLength(assetSymbol)).to.equal(1);
+
+            const trade = await contract.getTrade(assetSymbol, 0);
+            expect(await trade.from).to.equal(addr2.address);
+            expect(await trade.to).to.equal(addr1.address);
+            expect(await trade.quantity).to.equal(10);
+            expect(await trade.price).to.equal(100)
+            expect(await trade.isBuy).to.be.false
+
         });
 
     //     it("emits Transfer events", async function () {

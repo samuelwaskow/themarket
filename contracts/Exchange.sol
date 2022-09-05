@@ -4,11 +4,22 @@ pragma solidity ^0.8.4;
 import "hardhat/console.sol";
 
 contract Exchange {
+
     struct Order {
         address submitter;
         uint quantity;
         uint256 price;
         bool isBuy;
+        uint creationTime;
+    }
+
+    struct Trade {
+        address from;
+        address to;
+        uint quantity;
+        uint256 price;
+        bool isBuy;
+        uint creationTime;
     }
 
     struct Asset {
@@ -24,7 +35,8 @@ contract Exchange {
         // Book
         Order[] orders;
         // Times and Trades
-        Order[] trades;
+        Trade[] trades;
+        uint creationTime;
     }
 
     Asset[] public assets;
@@ -36,6 +48,8 @@ contract Exchange {
     constructor() {
         // lastPrice = initialPrice;
     }
+
+    /** Public Functions */
 
     /**
      * Creates a new asset
@@ -69,20 +83,6 @@ contract Exchange {
         a.bidPrice = price;
         a.askPrice = price;
 
-        // assets[assetCount] = Asset(
-        //     assetCount,
-        //     _owner,
-        //     _symbol,
-        //     _description,
-        //     price,
-        //     offer,
-        //     price,
-        //     price,
-        //     price,
-        //     new Order[](0),
-        //     new Order[](0)
-        // );
-
         assetCount++;
     }
 
@@ -100,8 +100,6 @@ contract Exchange {
     ) public {
         uint256 assetID = getAssetID(_symbol);
 
-        Order memory order = Order(to, _quantity, _price, _type);
-
         int foundIndex = -1;
         uint totalOrders = assets[assetID].orders.length;
         for (uint i = 0; i < totalOrders; i++) {
@@ -115,11 +113,37 @@ contract Exchange {
         }
 
         if (foundIndex < 0) {
+            Order memory order = Order(to, _quantity, _price, _type, block.timestamp);
             assets[assetID].orders.push(order);
         } else {
-            _removeOrder(assetID, uint(foundIndex));
-            assets[assetID].trades.push(order);
+            uint fIndex = uint(foundIndex);
+            address from = assets[assetID].orders[fIndex].submitter;
+            Trade memory trade = Trade(from, to, _quantity, _price, _type, block.timestamp);
+            _removeOrder(assetID, fIndex);
+            assets[assetID].trades.push(trade);
         }
+    }
+
+    /**
+     * Return an asset by its index
+     */
+    function getAsset(uint256 _index) public view returns (Asset memory) {
+        return assets[_index];
+    }
+
+    /**
+     * Returns the size of the assets array
+     */
+    function assetsLength() public view returns (uint256) {
+        return assets.length;
+    }
+
+    /**
+     * Return an order by its index
+     */
+    function getOrder(string memory _symbol, uint256 _index) public view returns (Order memory) {
+        uint256 assetID = getAssetID(_symbol);
+        return assets[assetID].orders[_index];
     }
 
     /**
@@ -131,12 +155,22 @@ contract Exchange {
     }
 
     /**
+     * Return an order by its index
+     */
+    function getTrade(string memory _symbol, uint256 _index) public view returns (Trade memory) {
+        uint256 assetID = getAssetID(_symbol);
+        return assets[assetID].trades[_index];
+    }
+
+    /**
      * Returns the size of the trades array
      */
     function tradesLength(string memory _symbol) public view returns (uint256) {
         uint256 assetID = getAssetID(_symbol);
         return assets[assetID].trades.length;
     }
+
+    /** Private Functions */
 
     /**
      * Removes the order from the book
