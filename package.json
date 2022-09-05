@@ -1,7 +1,7 @@
 {
   "name": "themarket",
   "version": "0.1.0",
-  "description": "A boilerplate repository to get you started with Hardhat and Ethereum development",
+  "description": "A Decentralized Assets Exchange",
   "scripts": {
     "test": "hardhat test"
   },

@@ -3,22 +3,17 @@ const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
 describe("Asset Contract", () => {
 
-    let ipoAmount;
-    let currentPrice;
 
     /**
      * Fixture
      */
     async function deployContractFixture() {
 
-        const Asset = await ethers.getContractFactory("Asset");
+        const Exchange = await ethers.getContractFactory("Exchange");
 
         const [owner, addr1, addr2] = await ethers.getSigners();
 
-        ipoAmount = 1000;
-        currentPrice = 10;
-
-        const contract = await Asset.deploy(ipoAmount, currentPrice);
+        const contract = await Exchange.deploy();
 
         await contract.deployed();
 
@@ -30,9 +25,9 @@ describe("Asset Contract", () => {
 
         it("verifies the default token values", async () => {
             const { contract, owner } = await loadFixture(deployContractFixture);
-            expect(await contract.totalSupply()).to.equal(ipoAmount); 
-            expect(await contract.lastPrice()).to.equal(currentPrice); 
-            expect(await contract.decimals()).to.equal(18);
+            // expect(await contract.totalSupply()).to.equal(ipoAmount); 
+            // expect(await contract.lastPrice()).to.equal(currentPrice); 
+            // expect(await contract.decimals()).to.equal(18);
         });
     });
 
@@ -40,21 +35,28 @@ describe("Asset Contract", () => {
 
         it("places an order", async () => {
 
-            const { contract, owner, addr1, addr2 } = await loadFixture(deployContractFixture);
+            const { contract, owner, addr1, addr2 } = await loadFixture(deployContractFixture)
+
+            let assetSymbol = "";
+            // Invalid Symbol
+            await  expect(contract.placeOrder(assetSymbol, addr1.address, 10, 90, true)).to.be.reverted
+
+            assetSymbol = "WINFT"
+            await contract.createAsset(owner.address, assetSymbol, "Ibovespa Index", 1, 1000)
 
             // Place an ask and a bid offers
-            await contract.placeOrder(addr1.address, 10, 90, true);
-            await contract.placeOrder(addr2.address, 10, 100, true);
-            await contract.placeOrder(addr1.address, 10, 110, false);
-            await contract.placeOrder(addr2.address, 10, 120, false);
+            await contract.placeOrder(assetSymbol, addr1.address, 10, 90, true);
+            await contract.placeOrder(assetSymbol, addr2.address, 10, 100, true);
+            await contract.placeOrder(assetSymbol, addr1.address, 10, 110, false);
+            await contract.placeOrder(assetSymbol, addr2.address, 10, 120, false);
 
-            expect(await contract.ordersLength()).to.equal(4);
-            expect(await contract.tradesLength()).to.equal(0);
+            expect(await contract.ordersLength(assetSymbol)).to.equal(4);
+            expect(await contract.tradesLength(assetSymbol)).to.equal(0);
 
-            await contract.placeOrder(addr1.address, 10, 100, false);
+            await contract.placeOrder(assetSymbol, addr1.address, 10, 100, false);
 
-            expect(await contract.ordersLength()).to.equal(3);
-            expect(await contract.tradesLength()).to.equal(1);
+            expect(await contract.ordersLength(assetSymbol)).to.equal(3);
+            expect(await contract.tradesLength(assetSymbol)).to.equal(1);
         });
 
     //     it("emits Transfer events", async function () {
