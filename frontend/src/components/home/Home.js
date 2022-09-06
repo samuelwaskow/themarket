@@ -4,6 +4,7 @@ import React from 'react';
 import '../app/App.css';
 
 import Notification from '../notification/Notification';
+import TopBar from './topbar/TopBar';
 
 class Home extends React.Component {
 
@@ -14,12 +15,20 @@ class Home extends React.Component {
      */
     render() {
         return (
-            <div className="App">
-                <header className="App-header">
-                    <Notification type="error" message={this.props.message} dismiss={this.props.dismiss} />
-                    <h1 className="display-1 mb-4">The Market</h1>
+            <div>
+                <Notification type="error" message={this.props.message} dismiss={this.props.dismiss} />
+                <TopBar />
+                <div className="container-fluid" id="main-container">
                     <p className="mb-4">{this.props.address}</p>
-                </header>
+                    <div className="row">
+                        <div className="col-sm-1">
+
+                        </div>
+                        <div className="col">
+
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }

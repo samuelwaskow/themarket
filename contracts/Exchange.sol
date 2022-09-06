@@ -113,14 +113,32 @@ contract Exchange {
         }
 
         if (foundIndex < 0) {
-            Order memory order = Order(to, _quantity, _price, _type, block.timestamp);
+            Order memory order = Order(
+                to,
+                _quantity,
+                _price,
+                _type,
+                block.timestamp
+            );
             assets[assetID].orders.push(order);
         } else {
             uint fIndex = uint(foundIndex);
             address from = assets[assetID].orders[fIndex].submitter;
-            Trade memory trade = Trade(from, to, _quantity, _price, _type, block.timestamp);
+            Trade memory trade = Trade(
+                from,
+                to,
+                _quantity,
+                _price,
+                _type,
+                block.timestamp
+            );
             _removeOrder(assetID, fIndex);
             assets[assetID].trades.push(trade);
+            // emit TradeCompleted(
+                // _proposalID,
+                // votesReceived,
+                // proposals[_proposalID].passed
+            // );
         }
     }
 
@@ -141,7 +159,11 @@ contract Exchange {
     /**
      * Return an order by its index
      */
-    function getOrder(string memory _symbol, uint256 _index) public view returns (Order memory) {
+    function getOrder(string memory _symbol, uint256 _index)
+        public
+        view
+        returns (Order memory)
+    {
         uint256 assetID = getAssetID(_symbol);
         return assets[assetID].orders[_index];
     }
@@ -157,7 +179,11 @@ contract Exchange {
     /**
      * Return an order by its index
      */
-    function getTrade(string memory _symbol, uint256 _index) public view returns (Trade memory) {
+    function getTrade(string memory _symbol, uint256 _index)
+        public
+        view
+        returns (Trade memory)
+    {
         uint256 assetID = getAssetID(_symbol);
         return assets[assetID].trades[_index];
     }

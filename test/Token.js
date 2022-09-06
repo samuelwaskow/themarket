@@ -1,18 +1,18 @@
 const { expect } = require("chai");
 const { loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
 
-describe("TheMarketToken Contract", () => {
+describe("Token Contract", () => {
 
     /**
      * Fixture
      */
     async function deployContractFixture() {
 
-        const TheMarketToken = await ethers.getContractFactory("TheMarketToken");
+        const Token = await ethers.getContractFactory("Token");
 
         const [owner, addr1, addr2] = await ethers.getSigners();
 
-        const contract = await TheMarketToken.deploy();
+        const contract = await Token.deploy();
 
         await contract.deployed();
 

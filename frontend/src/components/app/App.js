@@ -7,7 +7,7 @@ import NoWalletDetected from '../nowalletdetected/NoWalletDetected';
 import ConnectWallet from '../connectwallet/ConnectWallet';
 import Loading from '../loading/Loading'
 
-import TokenArtifact from "../../contracts/Token.json";
+import ExchangeArtifact from "../../contracts/Exchange.json";
 import contractAddress from "../../contracts/contract-address.json";
 import Home from '../home/Home';
 
@@ -32,12 +32,12 @@ class App extends React.Component {
 
     /**
      * We store multiple things in Dapp's state.
-     * - The info of the token (i.e. It's Name and symbol)
+     * - The info of the exchange
      * - The user's address and balance
      * - The ID about transactions being sent, and any possible error with them
      */
     this.initialState = {
-      tokenData: null,
+      exchangeData: null,
       selectedAddress: null,
       balance: null,
       txBeingSent: null,
@@ -84,7 +84,7 @@ class App extends React.Component {
      * If the token data or the user's balance hasn't loaded yet, we show
      * a loading component.
      */
-    if (!this.state.tokenData || !this.state.balance) {
+    if (!this.state.exchangeData || !this.state.balance) {
       return <Loading />;
     }
 
@@ -163,7 +163,7 @@ class App extends React.Component {
     });
 
     this._initializeEthers();
-    this._getTokenData();
+    this._getExchangeData();
     this._startPollingData();
   }
 
@@ -177,9 +177,9 @@ class App extends React.Component {
 
     this._provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    this._token = new ethers.Contract(
-      contractAddress.Token,
-      TokenArtifact.abi,
+    this._exchange = new ethers.Contract(
+      contractAddress.Exchange,
+      ExchangeArtifact.abi,
       this._provider.getSigner()
     );
   }
@@ -203,18 +203,18 @@ class App extends React.Component {
   /**
    * Store the contract results in the component state
    */
-  async _getTokenData() {
-    const name = await this._token.name();
-    const symbol = await this._token.symbol();
+  async _getTExchangeData() {
+    const name = await this._exchange.name();
+    const symbol = await this._exchange.symbol();
 
-    this.setState({ tokenData: { name, symbol } });
+    this.setState({ exchangeData: { name, symbol } });
   }
 
   /**
    * Store the balance in the component state
    */
   async _updateBalance() {
-    const balance = await this._token.balanceOf(this.state.selectedAddress);
+    const balance = await this._exchange.balanceOf(this.state.selectedAddress);
     console.log(`_updateBalance - address [${this.state.selectedAddress}] balance [${JSON.stringify(balance, undefined, 2)}]`);
     this.setState({ balance });
   }
@@ -248,7 +248,7 @@ class App extends React.Component {
 
       // We send the transaction, and save its hash in the Dapp's state. This
       // way we can indicate that we are waiting for it to be mined.
-      const tx = await this._token.transfer(to, amount);
+      const tx = await this._exchange.transfer(to, amount);
       this.setState({ txBeingSent: tx.hash });
 
       // We use .wait() to wait for the transaction to be mined. This method

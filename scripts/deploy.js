@@ -1,10 +1,13 @@
-// This is a script for deploying your contracts. You can adapt it to deploy
-// yours, or create new ones.
 
 const path = require("path");
+const fs = require("fs");
+const contractsDir = path.join(__dirname, "..", "frontend", "src", "contracts");
 
+/**
+ * Main deployer
+ */
 async function main() {
-    // This is just a convenience check
+    
     if (network.name === "hardhat") {
         console.warn(
             "You are trying to deploy a contract to the Hardhat Network, which" +
@@ -13,7 +16,6 @@ async function main() {
         );
     }
 
-    // ethers is available in the global scope
     const [deployer] = await ethers.getSigners();
     console.log(
         "Deploying the contracts with the account:",
@@ -22,19 +24,25 @@ async function main() {
 
     console.log("Account balance:", (await deployer.getBalance()).toString());
 
+    const Exchange = await ethers.getContractFactory("Exchange");
+    const exchange = await Exchange.deploy();
+    await exchange.deployed();
+
     const Token = await ethers.getContractFactory("Token");
     const token = await Token.deploy();
     await token.deployed();
 
+    console.log("Exchange address:", exchange.address);
     console.log("Token address:", token.address);
 
-    // We also save the contract's artifacts and address in the frontend directory
-    saveFrontendFiles(token);
+    saveFrontendFiles(exchange, token);
 }
 
-function saveFrontendFiles(token) {
-    const fs = require("fs");
-    const contractsDir = path.join(__dirname, "..", "frontend", "src", "contracts");
+/**
+ * We also save the contract's artifacts and address in the frontend directory
+ * @param {*} exchange 
+ */
+function saveFrontendFiles(exchange, token) {
 
     if (!fs.existsSync(contractsDir)) {
         fs.mkdirSync(contractsDir);
@@ -42,7 +50,14 @@ function saveFrontendFiles(token) {
 
     fs.writeFileSync(
         path.join(contractsDir, "contract-address.json"),
-        JSON.stringify({ Token: token.address }, undefined, 2)
+        JSON.stringify({ Exchange: exchange.address, Token: token.address }, undefined, 2)
+    );
+
+    const ExchangeArtifact = artifacts.readArtifactSync("Exchange");
+
+    fs.writeFileSync(
+        path.join(contractsDir, "Exchange.json"),
+        JSON.stringify(ExchangeArtifact, null, 2)
     );
 
     const TokenArtifact = artifacts.readArtifactSync("Token");
