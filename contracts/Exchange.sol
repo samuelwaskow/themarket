@@ -2,8 +2,11 @@
 pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
+import { Token } from "./Token.sol";
 
 contract Exchange {
+
+    string public name;
 
     struct Order {
         address submitter;
@@ -39,6 +42,7 @@ contract Exchange {
         uint creationTime;
     }
 
+    // Token public token;
     Asset[] public assets;
     uint256 public assetCount;
 
@@ -46,7 +50,8 @@ contract Exchange {
      * Constructor
      */
     constructor() {
-        // lastPrice = initialPrice;
+        // token = new Token();
+        name = "The Market";
     }
 
     /** Public Functions */

@@ -8,6 +8,7 @@ import ConnectWallet from '../connectwallet/ConnectWallet';
 import Loading from '../loading/Loading'
 
 import ExchangeArtifact from "../../contracts/Exchange.json";
+import TokenArtifact from "../../contracts/Token.json";
 import contractAddress from "../../contracts/contract-address.json";
 import Home from '../home/Home';
 
@@ -38,6 +39,7 @@ class App extends React.Component {
      */
     this.initialState = {
       exchangeData: null,
+      tokenData: null,
       selectedAddress: null,
       balance: null,
       txBeingSent: null,
@@ -164,6 +166,7 @@ class App extends React.Component {
 
     this._initializeEthers();
     this._getExchangeData();
+    this._getTokenData();
     this._startPollingData();
   }
 
@@ -180,6 +183,11 @@ class App extends React.Component {
     this._exchange = new ethers.Contract(
       contractAddress.Exchange,
       ExchangeArtifact.abi,
+      this._provider.getSigner()
+    );
+    this._token = new ethers.Contract(
+      contractAddress.Token,
+      TokenArtifact.abi,
       this._provider.getSigner()
     );
   }
@@ -203,11 +211,20 @@ class App extends React.Component {
   /**
    * Store the contract results in the component state
    */
-  async _getTExchangeData() {
+  async _getExchangeData() {
     const name = await this._exchange.name();
-    const symbol = await this._exchange.symbol();
 
-    this.setState({ exchangeData: { name, symbol } });
+    this.setState({ exchangeData: { name } });
+  }
+
+  /**
+   * Store the contract results in the component state
+   */
+   async _getTokenData() {
+    const name = await this._token.name();
+    const symbol = await this._token.symbol();
+
+    this.setState({ tokenData: { name, symbol } });
   }
 
   /**

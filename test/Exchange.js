@@ -26,9 +26,7 @@ describe("Exchange Contract", () => {
 
         it("verifies the default exchange state", async () => {
             const { contract, owner } = await loadFixture(deployContractFixture);
-            // expect(await contract.totalSupply()).to.equal(ipoAmount); 
-            // expect(await contract.lastPrice()).to.equal(currentPrice); 
-            // expect(await contract.decimals()).to.equal(18);
+            expect(await contract.name()).to.equal("The Market"); 
         });
     });
 
