@@ -12,23 +12,21 @@ class TopBar extends React.Component {
      */
     render() {
         return (
-            <nav className="navbar navbar-toggleable-md navbar-light bg-light">
-
-                <img className="navbar-brand d-flex" src={logo} alt="Logo" />
+            <nav className="navbar navbar-expand-lg navbar-light bg-light">
+                <div className="container-fluid">
+                    <img className="navbar-brand d-flex" style={{ height: 55, width: 55 }} src={logo} alt="Logo" />
 
                     <div className="mr-auto">
                         <div className="d-flex">
-                            <small><b></b></small>
-                        </div>
-                        <div className="d-flex">
-                            <small>Unidade: </small>
+                            <b>{this.props.title}</b>
                         </div>
                     </div>
 
                     <div className="navbar-nav">
-                    <button type="button" className="btn btn-link" onClick={this.props.logout}>Logout</button>
+                        <button type="button" className="btn btn-light" onClick={this.props.logout}>Logout</button>
+                    </div>
                 </div>
-            </nav>
+            </nav >
         );
     }
 

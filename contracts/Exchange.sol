@@ -52,6 +52,9 @@ contract Exchange {
     constructor() {
         // token = new Token();
         name = "The Market";
+        createAsset(address(this), "SPX", "S&P 500 Index", 397988, 1000000);
+        createAsset(address(this), "IXIC", "US Composite Index", 1179190, 1000000);
+        createAsset(address(this), "DJI", "Dow Jones Industrial Average Index", 3158129, 1000000);
     }
 
     /** Public Functions */
@@ -67,8 +70,8 @@ contract Exchange {
         uint256 offer
     ) public {
         require(
-            bytes(_symbol).length == 5,
-            "Symbol must have its length equals to 5"
+            bytes(_symbol).length > 2,
+            "Symbol must have its length greater than 2"
         );
 
         require(
@@ -145,6 +148,13 @@ contract Exchange {
                 // proposals[_proposalID].passed
             // );
         }
+    }
+
+    /**
+     * Return a list of assets
+     */
+    function listAssets() public view returns (Asset[] memory) {
+        return assets;
     }
 
     /**

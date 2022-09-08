@@ -27,6 +27,10 @@ describe("Exchange Contract", () => {
         it("verifies the default exchange state", async () => {
             const { contract, owner } = await loadFixture(deployContractFixture);
             expect(await contract.name()).to.equal("The Market"); 
+
+            const assets = await contract.listAssets();
+
+
         });
     });
 
@@ -37,8 +41,8 @@ describe("Exchange Contract", () => {
             const { contract, owner, addr1, addr2 } = await loadFixture(deployContractFixture)
 
             // Bad Symbols
-            await  expect(contract.createAsset(owner.address, "1234", "123456", 1, 1000)).to.be.reverted
-            await  expect(contract.createAsset(owner.address, "123456", "123456", 1, 1000)).to.be.reverted
+            await  expect(contract.createAsset(owner.address, "1", "123456", 1, 1000)).to.be.reverted
+            await  expect(contract.createAsset(owner.address, "12", "123456", 1, 1000)).to.be.reverted
 
             // Bad Descriptions
             await  expect(contract.createAsset(owner.address, "12345", "1234", 1, 1000)).to.be.reverted
@@ -53,10 +57,10 @@ describe("Exchange Contract", () => {
             const description = "Ibovespa Index";
             await contract.createAsset(owner.address, assetSymbol, description, 1, 1000)
 
-            expect(await contract.assetCount()).to.equal(1);
-            expect(await contract.assetsLength()).to.equal(1);
+            expect(await contract.assetCount()).to.equal(4);
+            expect(await contract.assetsLength()).to.equal(4);
 
-            const asset = await contract.getAsset(0);
+            const asset = await contract.getAsset(3);
 
             expect(await asset.symbol).to.equal(assetSymbol);
             expect(await asset.description).to.equal(description);
@@ -93,8 +97,8 @@ describe("Exchange Contract", () => {
             expect(await contract.tradesLength(assetSymbol)).to.equal(1);
 
             const trade = await contract.getTrade(assetSymbol, 0);
-            expect(await trade.from).to.equal(addr2.address);
-            expect(await trade.to).to.equal(addr1.address);
+            expect(trade.from).to.equal(addr2.address);
+            expect(trade.to).to.equal(addr1.address);
             expect(await trade.quantity).to.equal(10);
             expect(await trade.price).to.equal(100)
             expect(await trade.isBuy).to.be.false

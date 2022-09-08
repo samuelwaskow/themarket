@@ -90,14 +90,17 @@ class App extends React.Component {
       return <Loading />;
     }
 
-    return <Home address={this.state.selectedAddress} />
+    return <Home title={this.state.exchangeData.name} logout={() => {
+      this._stopPollingData();
+      this._resetState();
+    }} />
   }
 
   /**
    * We poll the user's balance, so we have to stop doing that when Dapp
    * gets unmounted
    */
-  componentWillUnmount() { 
+  componentWillUnmount() {
     this._stopPollingData();
   }
 
@@ -220,7 +223,7 @@ class App extends React.Component {
   /**
    * Store the contract results in the component state
    */
-   async _getTokenData() {
+  async _getTokenData() {
     const name = await this._token.name();
     const symbol = await this._token.symbol();
 
@@ -231,7 +234,7 @@ class App extends React.Component {
    * Store the balance in the component state
    */
   async _updateBalance() {
-    const balance = await this._exchange.balanceOf(this.state.selectedAddress);
+    const balance = await this._token.balanceOf(this.state.selectedAddress);
     console.log(`_updateBalance - address [${this.state.selectedAddress}] balance [${JSON.stringify(balance, undefined, 2)}]`);
     this.setState({ balance });
   }
