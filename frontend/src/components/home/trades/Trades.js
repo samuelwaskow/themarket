@@ -4,15 +4,6 @@ import React from 'react';
 class Trades extends React.Component {
 
     /**
-     * Constructor
-     * @param {*} props 
-     */
-    constructor(props) { 
-        super(props); 
-
-    }
-
-    /**
      * Renderer function
      * 
      * @returns Code to be displayed
@@ -21,6 +12,7 @@ class Trades extends React.Component {
         return (
             <div>
                 <h1>Trades</h1>
+                <h5>{this.props.title}</h5>
             </div>
         );
     }

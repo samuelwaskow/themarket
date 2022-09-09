@@ -19,12 +19,14 @@ class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentScreen: 'Assets'
+            currentScreen: 'Assets',
+            pageSubtitle: 'Select an asset',
+            selectedAsset: null
         };
     }
 
     /** 
-     * Changes the current app state
+     * Changes the current app screen
      * @param {*} val 
      */
     getItemClick = (val) => {
@@ -34,16 +36,31 @@ class Home extends React.Component {
     }
 
     /**
+     * Selects the asset
+     * @param {*} val 
+     */
+    getAsset = (val) => {
+        this.setState({
+            currentScreen: 'Orders',
+            selectedAsset: this.props.assets[val],
+            pageSubtitle: this.props.assets[val].description,
+        }, () => {
+            console.warn(JSON.stringify(this.state, undefined, 2));
+        });
+
+    }
+
+    /**
      * Renderer function
      * 
      * @returns Code to be displayed
      */
     render() {
-        let screen = <Assets />;
+        let screen = <Assets assets={this.props.assets} sendItem={this.getAsset} />;
         if (this.state.currentScreen === 'Orders') {
-            screen = <Orders />;
+            screen = <Orders title={this.state.pageSubtitle} />;
         } else if (this.state.currentScreen === 'Trades') {
-            screen = <Trades />;
+            screen = <Trades title={this.state.pageSubtitle} />;
         }
         return (
             <div>

@@ -42,6 +42,9 @@ class App extends React.Component {
       tokenData: null,
       selectedAddress: null,
       balance: null,
+      assets: [],
+      orders: [],
+      trades: [],
       txBeingSent: null,
       transactionError: null,
       networkError: null,
@@ -73,7 +76,7 @@ class App extends React.Component {
      * Note that we pass it a callback that is going to be called when the user
      * clicks a button. This callback just calls the _connectWallet method.
      */
-    console.log(`render - state [${JSON.stringify(this.state, undefined, 2)}]`);
+    // console.log(`render - state [${JSON.stringify(this.state, undefined, 2)}]`);
     if (!this.state.selectedAddress) {
       return <ConnectWallet
         connectWallet={() => this._connectWallet()}
@@ -90,7 +93,7 @@ class App extends React.Component {
       return <Loading />;
     }
 
-    return <Home title={this.state.exchangeData.name} logout={() => {
+    return <Home title={this.state.exchangeData.name} assets={this.state.assets} logout={() => {
       this._stopPollingData();
       this._resetState();
     }} />
@@ -200,7 +203,7 @@ class App extends React.Component {
    * Start polling to update the user's balance
    */
   _startPollingData() {
-    this._pollDataInterval = setInterval(() => this._updateBalance(), 1000);
+    this._pollDataInterval = setInterval(() => this._updateExchange(), 1000);
   }
 
   /**
@@ -233,10 +236,14 @@ class App extends React.Component {
   /**
    * Store the balance in the component state
    */
-  async _updateBalance() {
+  async _updateExchange() {
     const balance = await this._token.balanceOf(this.state.selectedAddress);
-    console.log(`_updateBalance - address [${this.state.selectedAddress}] balance [${JSON.stringify(balance, undefined, 2)}]`);
+    // console.log(`_updateExchange - address [${this.state.selectedAddress}] balance [${JSON.stringify(balance, undefined, 2)}]`);
     this.setState({ balance });
+
+    const assets = await this._exchange.listAssets();
+    this.setState({ assets: assets });
+    // console.log(`_updateExchange - assets [${assets}]`);
   }
 
   /**
