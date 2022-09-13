@@ -50,11 +50,14 @@ contract Exchange {
      * Constructor
      */
     constructor() {
-        // token = new Token();
         name = "The Market";
         createAsset(address(this), "SPX", "S&P 500 Index", 397988, 1000000);
         createAsset(address(this), "IXIC", "US Composite Index", 1179190, 1000000);
         createAsset(address(this), "DJI", "Dow Jones Industrial Average Index", 3158129, 1000000);
+
+        placeOrder("SPX", address(this), 1000000, 397988, false);
+        placeOrder("IXIC", address(this), 1000000, 1179190, false);
+        placeOrder("DJI", address(this), 1000000, 3158129, false);
     }
 
     /** Public Functions */
@@ -119,7 +122,6 @@ contract Exchange {
                 break;
             }
         }
-
         if (foundIndex < 0) {
             Order memory order = Order(
                 to,
@@ -172,6 +174,13 @@ contract Exchange {
     }
 
     /**
+     * Return a list of orders
+     */
+    function listOrders(uint256 assetID) public view returns (Order[] memory) {
+        return assets[assetID].orders;
+    }
+
+    /**
      * Return an order by its index
      */
     function getOrder(string memory _symbol, uint256 _index)
@@ -189,6 +198,13 @@ contract Exchange {
     function ordersLength(string memory _symbol) public view returns (uint256) {
         uint256 assetID = getAssetID(_symbol);
         return assets[assetID].orders.length;
+    }
+
+    /**
+     * Return a list of trades
+     */
+    function listTrades(uint256 assetID) public view returns (Trade[] memory) {
+        return assets[assetID].trades;
     }
 
     /**

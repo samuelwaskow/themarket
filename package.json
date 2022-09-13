@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "description": "A Decentralized Assets Exchange",
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "node": "hardhat node",
+    "deploydev" : "hardhat run scripts/deploy.js --network localhost"
   },
   "repository": {
     "type": "git",

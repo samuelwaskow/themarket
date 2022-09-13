@@ -29,6 +29,14 @@ describe("Exchange Contract", () => {
             expect(await contract.name()).to.equal("The Market"); 
 
             const assets = await contract.listAssets();
+            expect(assets[0].symbol).to.equal("SPX"); 
+            expect(await contract.ordersLength("SPX")).to.equals(1);
+
+            expect(assets[1].symbol).to.equal("IXIC"); 
+            expect(await contract.ordersLength("IXIC")).to.equals(1);
+
+            expect(assets[2].symbol).to.equal("DJI"); 
+            expect(await contract.ordersLength("DJI")).to.equals(1);
 
 
         });

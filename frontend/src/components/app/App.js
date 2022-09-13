@@ -43,6 +43,7 @@ class App extends React.Component {
       selectedAddress: null,
       balance: null,
       assets: [],
+      selectedAsset: null,
       orders: [],
       trades: [],
       txBeingSent: null,
@@ -93,7 +94,7 @@ class App extends React.Component {
       return <Loading />;
     }
 
-    return <Home title={this.state.exchangeData.name} assets={this.state.assets} logout={() => {
+    return <Home title={this.state.exchangeData.name} assets={this.state.assets} orders={this.state.orders} trades={this.state.trades} selectAsset={this._selectAsset} logout={() => {
       this._stopPollingData();
       this._resetState();
     }} />
@@ -238,12 +239,29 @@ class App extends React.Component {
    */
   async _updateExchange() {
     const balance = await this._token.balanceOf(this.state.selectedAddress);
-    // console.log(`_updateExchange - address [${this.state.selectedAddress}] balance [${JSON.stringify(balance, undefined, 2)}]`);
     this.setState({ balance });
 
     const assets = await this._exchange.listAssets();
     this.setState({ assets: assets });
-    // console.log(`_updateExchange - assets [${assets}]`);
+
+    if (this.state.selectedAsset) {
+      const orders = await this._exchange.listOrders(this.state.selectedAsset);
+      this.setState({ orders: orders });
+
+      console.log(JSON.stringify(orders, undefined, 2));
+
+      const trades = await this._exchange.listTrades(this.state.selectedAsset);
+      this.setState({ trades: trades });
+    }
+    // console.log(JSON.stringify(this.state, undefined));
+  }
+
+  /**
+   * Selects an asset
+   * @param {*} asset 
+   */
+  _selectAsset = (asset) => {
+    this.setState({ selectedAsset: asset });
   }
 
   /**

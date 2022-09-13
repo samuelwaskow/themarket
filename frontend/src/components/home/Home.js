@@ -20,8 +20,7 @@ class Home extends React.Component {
         super(props);
         this.state = {
             currentScreen: 'Assets',
-            pageSubtitle: 'Select an asset',
-            selectedAsset: null
+            pageSubtitle: 'Select an asset'
         };
     }
 
@@ -42,12 +41,11 @@ class Home extends React.Component {
     getAsset = (val) => {
         this.setState({
             currentScreen: 'Orders',
-            selectedAsset: this.props.assets[val],
             pageSubtitle: this.props.assets[val].description,
         }, () => {
-            console.warn(JSON.stringify(this.state, undefined, 2));
+            console.warn(JSON.stringify(this.props.assets[val].orders, undefined, 2));
         });
-
+        this.props.selectAsset(val);
     }
 
     /**
@@ -58,9 +56,9 @@ class Home extends React.Component {
     render() {
         let screen = <Assets assets={this.props.assets} sendItem={this.getAsset} />;
         if (this.state.currentScreen === 'Orders') {
-            screen = <Orders title={this.state.pageSubtitle} />;
+            screen = <Orders title={this.state.pageSubtitle} orders={this.props.orders} />;
         } else if (this.state.currentScreen === 'Trades') {
-            screen = <Trades title={this.state.pageSubtitle} />;
+            screen = <Trades title={this.state.pageSubtitle} trades={this.props.trades} />;
         }
         return (
             <div>
