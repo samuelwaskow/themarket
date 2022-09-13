@@ -14,24 +14,21 @@ class Orders extends React.Component {
                 <h1>Orders</h1>
                 <h5>{this.props.title}</h5>
 
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Price</th>
-                            <th scope="col">Quantity</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.props.orders.map(o => {
-                            return (
-                                <tr key={o.creationTime}>
-                                    <td>{parseInt(o.price)}</td>
-                                    <td>{parseInt(o.quantity)}</td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>Price</div>
+                        <div>Quantity</div>
+                    </li>
+                    {this.props.orders.map(o => {
+                        const typeStyle = o.isBuy ? "list-group-item d-flex justify-content-between align-items-center list-group-item-primary" : "list-group-item d-flex justify-content-between align-items-center list-group-item-danger";
+                        return (
+                            <li key={o.creationTime} class={typeStyle}>
+                                <div>{parseInt(o.price)}</div>
+                                <div>{parseInt(o.quantity)}</div>
+                            </li>
+                        );
+                    })}
+                </ul>
             </div>
         );
     }

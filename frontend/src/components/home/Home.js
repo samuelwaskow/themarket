@@ -42,8 +42,6 @@ class Home extends React.Component {
         this.setState({
             currentScreen: 'Orders',
             pageSubtitle: this.props.assets[val].description,
-        }, () => {
-            console.warn(JSON.stringify(this.props.assets[val].orders, undefined, 2));
         });
         this.props.selectAsset(val);
     }
