@@ -94,10 +94,17 @@ class App extends React.Component {
       return <Loading />;
     }
 
-    return <Home title={this.state.exchangeData.name} assets={this.state.assets} orders={this.state.orders} trades={this.state.trades} selectAsset={this._selectAsset} logout={() => {
-      this._stopPollingData();
-      this._resetState();
-    }} />
+    return <Home
+      title={this.state.exchangeData.name}
+      assets={this.state.assets}
+      orders={this.state.orders}
+      trades={this.state.trades}
+      selectAsset={this._selectAsset}
+      placeOrder={this._placeAnOrder}
+      logout={() => {
+        this._stopPollingData();
+        this._resetState();
+      }} />
   }
 
   /**
@@ -248,7 +255,7 @@ class App extends React.Component {
       const orders = await this._exchange.listOrders(this.state.selectedAsset);
       this.setState({ orders: orders });
 
-      console.log(JSON.stringify(orders, undefined, 2));
+      // console.log(JSON.stringify(orders, undefined, 2));
 
       const trades = await this._exchange.listTrades(this.state.selectedAsset);
       this.setState({ trades: trades });
@@ -262,6 +269,14 @@ class App extends React.Component {
    */
   _selectAsset = (asset) => {
     this.setState({ selectedAsset: asset });
+  }
+
+  /**
+   * Places an order to the smart contract
+   * @param {*} asset 
+   */
+  _placeAnOrder = (isBuy, price, quantity) => {
+    console.log(`isBuy [${isBuy}] price [${price}] quantity [${quantity}]`);
   }
 
   /**

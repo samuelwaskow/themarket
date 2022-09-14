@@ -54,7 +54,7 @@ class Home extends React.Component {
     render() {
         let screen = <Assets assets={this.props.assets} sendItem={this.getAsset} />;
         if (this.state.currentScreen === 'Orders') {
-            screen = <Orders title={this.state.pageSubtitle} orders={this.props.orders} />;
+            screen = <Orders title={this.state.pageSubtitle} orders={this.props.orders} placeOrder={this.props.placeOrder} />;
         } else if (this.state.currentScreen === 'Trades') {
             screen = <Trades title={this.state.pageSubtitle} trades={this.props.trades} />;
         }
