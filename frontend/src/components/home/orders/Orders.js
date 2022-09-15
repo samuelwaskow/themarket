@@ -67,7 +67,7 @@ class Orders extends React.Component {
      * Sets a buy order
      * @param {*} evt 
      */
-     orderType(evt) {
+    orderType(evt) {
         this.setState({ isBuy: evt.target.value === "true" });
     }
 
@@ -77,6 +77,7 @@ class Orders extends React.Component {
      * @returns Code to be displayed
      */
     render() {
+        const isAssetSelected = this.props.title !== 'Select an asset';
         return (
             <div>
                 <div className="d-flex justify-content-between align-items-center">
@@ -84,28 +85,32 @@ class Orders extends React.Component {
                         <h1>Orders</h1>
                         <h5>{this.props.title}</h5>
                     </div>
-                    <button type="button"
-                        className="btn btn-primary"
-                        aria-label="Add"
-                        onClick={this.addNewOrder}>
-                        <span aria-hidden="true">+</span>
-                    </button>
+                    { isAssetSelected &&
+                        <button type="button"
+                            className="btn btn-primary"
+                            aria-label="Add"
+                            onClick={this.addNewOrder}>
+                            <span aria-hidden="true">+</span>
+                        </button>
+                    }
                 </div>
-                <ul className="list-group">
-                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                        <div>Price</div>
-                        <div>Quantity</div>
-                    </li>
-                    {this.props.orders.map(o => {
-                        const typeStyle = o.isBuy ? "list-group-item d-flex justify-content-between align-items-center list-group-item-primary" : "list-group-item d-flex justify-content-between align-items-center list-group-item-danger";
-                        return (
-                            <li key={o.creationTime} className={typeStyle}>
-                                <div>{parseInt(o.price)}</div>
-                                <div>{parseInt(o.quantity)}</div>
-                            </li>
-                        );
-                    })}
-                </ul>
+                { isAssetSelected &&
+                    <ul className="list-group">
+                        <li className="list-group-item d-flex justify-content-between align-items-center">
+                            <div>Price</div>
+                            <div>Quantity</div>
+                        </li>
+                        {this.props.orders.map(o => {
+                            const typeStyle = o.isBuy ? "list-group-item d-flex justify-content-between align-items-center list-group-item-primary" : "list-group-item d-flex justify-content-between align-items-center list-group-item-danger";
+                            return (
+                                <li key={o.creationTime} className={typeStyle}>
+                                    <div>{parseInt(o.price)}</div>
+                                    <div>{parseInt(o.quantity)}</div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                }
                 <Modal show={this.state.showAddOrderModal} onHide={this.cancelNewOrder}>
                     <Modal.Header closeButton>
                         <Modal.Title>New Order</Modal.Title>

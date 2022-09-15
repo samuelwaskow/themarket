@@ -49,6 +49,7 @@ class App extends React.Component {
       txBeingSent: null,
       transactionError: null,
       networkError: null,
+      pendingOrder: null,
     };
 
     this.state = this.initialState;
@@ -260,7 +261,13 @@ class App extends React.Component {
       const trades = await this._exchange.listTrades(this.state.selectedAsset);
       this.setState({ trades: trades });
     }
-    // console.log(JSON.stringify(this.state, undefined));
+    console.log(JSON.stringify(this.state, undefined));
+    if(this.state.pendingOrder != null){
+      const pendingOrder = this.state.pendingOrder;
+      await this._exchange.placeOrder(pendingOrder.symbol, pendingOrder.to, pendingOrder.quantity, pendingOrder.price, pendingOrder.isBuy);
+      // this.setState({ pendingOrder: null });
+
+    }
   }
 
   /**
@@ -276,7 +283,18 @@ class App extends React.Component {
    * @param {*} asset 
    */
   _placeAnOrder = (isBuy, price, quantity) => {
-    console.log(`isBuy [${isBuy}] price [${price}] quantity [${quantity}]`);
+    if (this.state.pendingOrder == null) {
+      this.setState({
+        pendingOrder: {
+          symbol: this.state.assets[this.state.selectedAsset].symbol,
+          to: this.state.selectedAddress,
+          isBuy: isBuy,
+          price: price,
+          quantity: quantity
+        }
+      })
+    }
+    console.log(`symbol [${this.state.assets[this.state.selectedAsset].symbol}] to [${this.state.selectedAddress}] isBuy [${isBuy}] price [${price}] quantity [${quantity}]`);
   }
 
   /**
