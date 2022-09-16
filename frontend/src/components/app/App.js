@@ -47,6 +47,7 @@ class App extends React.Component {
       transactionError: null,
       networkError: null,
       pendingOrder: null,
+      orderStatus: 0
     };
 
     this.state = this.initialState;
@@ -100,6 +101,7 @@ class App extends React.Component {
       selectAsset={this._selectAsset}
       placeOrder={this._placeAnOrder}
       message={this.state.transactionError}
+      dismiss={this._dismissTransactionError}
       logout={() => {
         this._stopPollingData();
         this._resetState();
@@ -254,22 +256,22 @@ class App extends React.Component {
       const orders = await this._exchange.listOrders(this.state.selectedAsset);
       this.setState({ orders: orders });
 
-      // console.log(JSON.stringify(orders, undefined, 2));
-
       const trades = await this._exchange.listTrades(this.state.selectedAsset);
       this.setState({ trades: trades });
     }
 
-    if (this.state.pendingOrder != null) {
+    if (this.state.orderStatus === 1) {
+      this.setState({ orderStatus: 2 });
       const pendingOrder = this.state.pendingOrder;
       console.log(JSON.stringify(this.state.pendingOrder, undefined, 2));
 
       try {
         await this._exchange.placeOrder(pendingOrder.symbol, pendingOrder.to, pendingOrder.quantity, pendingOrder.price, pendingOrder.isBuy);
-        this.setState({ pendingOrder: null });
       } catch (error) {
-        console.error(error);
-        this.setState({ transactionError: error });
+        // console.error(error);
+        this.setState({ transactionError: this._getRpcErrorMessage(error) });
+      } finally {
+        this.setState({ pendingOrder: null, orderStatus: 0 });
       }
     }
   }
@@ -295,10 +297,11 @@ class App extends React.Component {
           isBuy: isBuy,
           price: price,
           quantity: quantity
-        }
+        },
+        orderStatus: 1
       })
     }
-    console.log(`symbol [${this.state.assets[this.state.selectedAsset].symbol}] to [${this.state.selectedAddress}] isBuy [${isBuy}] price [${price}] quantity [${quantity}]`);
+    // console.log(`symbol [${this.state.assets[this.state.selectedAsset].symbol}] to [${this.state.selectedAddress}] isBuy [${isBuy}] price [${price}] quantity [${quantity}]`);
   }
 
   /**
@@ -363,7 +366,7 @@ class App extends React.Component {
   /**
    * This method just clears part of the state.
    */
-  _dismissTransactionError() {
+  _dismissTransactionError = () =>{
     this.setState({ transactionError: null });
   }
 
@@ -384,8 +387,7 @@ class App extends React.Component {
     if (error.data) {
       return error.data.message;
     }
-
-    return error.message;
+    return error.reason;
   }
 
   /**

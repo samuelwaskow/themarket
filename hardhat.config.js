@@ -8,5 +8,10 @@ module.exports = {
   solidity: "0.8.9",
   gasReporter: {
     enabled: false
+  },
+  networks: {
+    hardhat: {
+      chainId: 1337,
+    }
   }
 };
