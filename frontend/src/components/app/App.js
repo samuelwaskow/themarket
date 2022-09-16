@@ -19,9 +19,6 @@ import Home from '../home/Home';
  */
 const HARDHAT_NETWORK_ID = '31337';
 
-// This is an error code that indicates that the user canceled a transaction
-const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
-
 class App extends React.Component {
 
   /**
@@ -102,6 +99,7 @@ class App extends React.Component {
       trades={this.state.trades}
       selectAsset={this._selectAsset}
       placeOrder={this._placeAnOrder}
+      message={this.state.transactionError}
       logout={() => {
         this._stopPollingData();
         this._resetState();
@@ -261,12 +259,18 @@ class App extends React.Component {
       const trades = await this._exchange.listTrades(this.state.selectedAsset);
       this.setState({ trades: trades });
     }
-    console.log(JSON.stringify(this.state, undefined));
-    if(this.state.pendingOrder != null){
-      const pendingOrder = this.state.pendingOrder;
-      await this._exchange.placeOrder(pendingOrder.symbol, pendingOrder.to, pendingOrder.quantity, pendingOrder.price, pendingOrder.isBuy);
-      // this.setState({ pendingOrder: null });
 
+    if (this.state.pendingOrder != null) {
+      const pendingOrder = this.state.pendingOrder;
+      console.log(JSON.stringify(this.state.pendingOrder, undefined, 2));
+
+      try {
+        await this._exchange.placeOrder(pendingOrder.symbol, pendingOrder.to, pendingOrder.quantity, pendingOrder.price, pendingOrder.isBuy);
+        this.setState({ pendingOrder: null });
+      } catch (error) {
+        console.error(error);
+        this.setState({ transactionError: error });
+      }
     }
   }
 
@@ -344,11 +348,6 @@ class App extends React.Component {
       // update your state. Here, we update the user's balance.
       await this._updateBalance();
     } catch (error) {
-      // We check the error code to see if this error was produced because the
-      // user rejected a tx. If that's the case, we do nothing.
-      if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
-        return;
-      }
 
       // Other errors are logged and stored in the Dapp's state. This is used to
       // show them to the user, and for debugging.
