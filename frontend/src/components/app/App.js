@@ -17,7 +17,7 @@ import Home from '../home/Home';
  * Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
  * to use when deploying to other networks.
  */
-const HARDHAT_NETWORK_ID = '31337';
+const HARDHAT_NETWORK_ID = '1337';
 
 class App extends React.Component {
 
